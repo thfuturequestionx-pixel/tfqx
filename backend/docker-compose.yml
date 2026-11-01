@@ -1,0 +1,78 @@
+# Runs MongoDB and the TFQX API in containers: no Atlas account needed.
+#
+#   cd backend
+#   cp .env.example .env        # then fill in the values
+#   docker compose up --build   # API on http://localhost:8000 (docs at /docs)
+#
+# Data lives in two named volumes (mongo_data, api_uploads) and survives restarts.
+# `docker compose down` keeps it; `docker compose down -v` DELETES it.
+
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-tfqx}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?Set MONGO_PASSWORD in backend/.env}
+    volumes:
+      - mongo_data:/data/db
+    # Not published to your computer by default (only the API can reach it).
+    # Uncomment to inspect the data with MongoDB Compass:
+    ports:
+      - "127.0.0.1:27017:27017"
+    healthcheck:
+      # Connects through the container's network address with a login, so it only
+      # passes once the real server is up (not the temporary first-start server).
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --host "$$(hostname)" -u "$$MONGO_INITDB_ROOT_USERNAME"
+          -p "$$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin
+          --eval "db.adminCommand('ping').ok" | grep -q 1
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+  api:
+    build: .
+    restart: on-failure
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGODB_URI: mongodb://${MONGO_USER:-tfqx}:${MONGO_PASSWORD}@mongo:27017/?authSource=admin
+      MONGODB_DB: ${MONGODB_DB:-tfqx}
+      HOST_USERNAME: ${HOST_USERNAME:-host}
+      HOST_PASSWORD: ${HOST_PASSWORD:?Set HOST_PASSWORD in backend/.env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in backend/.env}
+      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-480}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+    ports:
+      - "8000:8000"
+    volumes:
+      - api_uploads:/data/uploads
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # Optional live reload while developing: `docker compose watch`
+    # (needs Docker Compose 2.23+). Code changes in ./app restart the API.
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./app
+          target: /app/app
+        - action: rebuild
+          path: requirements.txt
+
+volumes:
+  mongo_data:
+  api_uploads:

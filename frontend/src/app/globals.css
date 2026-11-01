@@ -1,0 +1,338 @@
+@import "tailwindcss";
+
+/* Light theme values (also the fallback default) */
+:root {
+  --background: #ffffff;
+  --surface: rgba(76, 29, 149, 0.04);
+  --surface-strong: rgba(76, 29, 149, 0.08);
+  --foreground: #2e1065;
+  --muted: #6b21a8;
+  --border: rgba(46, 16, 101, 0.12);
+  --accent-start: #4c1d95;
+  --accent-end: #7e22ce;
+  --accent-soft: rgba(107, 33, 168, 0.1);
+  --scrim-a: rgba(255, 255, 255, 0.75);
+  --scrim-b: rgba(255, 255, 255, 0.55);
+  --scrim-c: rgba(255, 255, 255, 0.92);
+  --video-tint: rgba(76, 29, 149, 0.12);
+  --scrim-strong: rgba(255, 255, 255, 0.92);
+  --scrim-clear: rgba(255, 255, 255, 0);
+  --panel: rgba(255, 255, 255, 0.72);
+  --icon-sun-display: none;
+  --icon-moon-display: inline;
+}
+
+/* System preference: applies automatically, no JS required, zero flash */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --surface: rgba(233, 213, 255, 0.04);
+    --surface-strong: rgba(233, 213, 255, 0.08);
+    --foreground: #f3e8ff;
+    --muted: #c4b5fd;
+    --border: rgba(243, 232, 255, 0.12);
+    --accent-start: #a855f7;
+    --accent-end: #e9d5ff;
+    --accent-soft: rgba(192, 132, 252, 0.12);
+    --scrim-a: rgba(0, 0, 0, 0.75);
+    --scrim-b: rgba(0, 0, 0, 0.55);
+    --scrim-c: rgba(0, 0, 0, 0.92);
+    --video-tint: rgba(192, 132, 252, 0.12);
+    --scrim-strong: rgba(0, 0, 0, 0.92);
+    --scrim-clear: rgba(0, 0, 0, 0);
+    --panel: rgba(0, 0, 0, 0.6);
+    --icon-sun-display: inline;
+    --icon-moon-display: none;
+  }
+}
+
+/* Explicit overrides from the header toggle — these win over system
+   preference because they're declared after it, with matching specificity. */
+.dark {
+  --background: #000000;
+  --surface: rgba(233, 213, 255, 0.04);
+  --surface-strong: rgba(233, 213, 255, 0.08);
+  --foreground: #f3e8ff;
+  --muted: #c4b5fd;
+  --border: rgba(243, 232, 255, 0.12);
+  --accent-start: #a855f7;
+  --accent-end: #e9d5ff;
+  --accent-soft: rgba(192, 132, 252, 0.12);
+  --scrim-a: rgba(0, 0, 0, 0.75);
+  --scrim-b: rgba(0, 0, 0, 0.55);
+  --scrim-c: rgba(0, 0, 0, 0.92);
+  --video-tint: rgba(192, 132, 252, 0.12);
+  --scrim-strong: rgba(0, 0, 0, 0.92);
+  --scrim-clear: rgba(0, 0, 0, 0);
+  --panel: rgba(0, 0, 0, 0.6);
+  --icon-sun-display: inline;
+  --icon-moon-display: none;
+}
+
+.light {
+  --background: #ffffff;
+  --surface: rgba(76, 29, 149, 0.04);
+  --surface-strong: rgba(76, 29, 149, 0.08);
+  --foreground: #2e1065;
+  --muted: #6b21a8;
+  --border: rgba(46, 16, 101, 0.12);
+  --accent-start: #4c1d95;
+  --accent-end: #7e22ce;
+  --accent-soft: rgba(107, 33, 168, 0.1);
+  --scrim-a: rgba(255, 255, 255, 0.75);
+  --scrim-b: rgba(255, 255, 255, 0.55);
+  --scrim-c: rgba(255, 255, 255, 0.92);
+  --video-tint: rgba(76, 29, 149, 0.12);
+  --scrim-strong: rgba(255, 255, 255, 0.92);
+  --scrim-clear: rgba(255, 255, 255, 0);
+  --panel: rgba(255, 255, 255, 0.72);
+  --icon-sun-display: none;
+  --icon-moon-display: inline;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: clip; /* drifting content may poke past the right edge: no sideways scrolling */
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* Text selection tinted to the brand gradient */
+::selection {
+  background-color: var(--accent-start);
+  color: #ffffff;
+}
+
+/* Scrollbar (WebKit) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--accent-start), var(--accent-end));
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--accent-end), var(--accent-start));
+}
+
+/* Visible keyboard focus, kept brand-colored instead of the browser default */
+:focus-visible {
+  outline: 2px solid var(--accent-end);
+  outline-offset: 2px;
+}
+
+@utility text-gradient {
+  background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility border-gradient {
+  border-image: linear-gradient(135deg, var(--accent-start), var(--accent-end)) 1;
+}
+
+@utility icon-sun {
+  display: var(--icon-sun-display);
+}
+
+@utility icon-moon {
+  display: var(--icon-moon-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Background scrim: solid on the left where the text sits, fading out on the
+   right so the video stays visible in the empty half. On small screens the
+   text spans the full width, so the scrim becomes uniform. */
+.hero-scrim {
+  background: linear-gradient(
+    to right,
+    var(--scrim-strong) 0%,
+    var(--scrim-strong) 40%,
+    var(--scrim-clear) 80%
+  );
+}
+@media (max-width: 767px) {
+  .hero-scrim {
+    background: var(--scrim-strong);
+  }
+}
+
+/* Blinking cursor for the TypeWriter component. Zero width so it never
+   pushes text around while typing. */
+.typewriter-cursor {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: -0.1em;
+}
+.typewriter-cursor::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  bottom: 0;
+  width: 0.06em;
+  min-width: 3px;
+  border-radius: 2px;
+  background: var(--accent-end);
+  animation: typewriter-blink 1s steps(1) infinite;
+}
+@keyframes typewriter-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Text of the typing headline that has not been typed yet: kept in the layout, but hidden. */
+.typewriter-rest {
+  visibility: hidden;
+}
+/* Safety net: if the page's JavaScript has not started after 2.5s (slow phone or connection),
+   show the headline anyway instead of leaving it blank. */
+[data-typing='pending'] .typewriter-rest {
+  animation: typewriter-fallback 0s linear 2.5s forwards;
+}
+@keyframes typewriter-fallback {
+  to {
+    visibility: visible;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                              */
+/* ------------------------------------------------------------------ */
+
+@keyframes motion-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Plays once when the page loads. Stagger with style={{ '--delay': '0.15s' }} */
+  .motion-in {
+    animation: motion-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--delay, 0s);
+  }
+
+  /* Fades/slides in as it scrolls into view. Pure CSS: browsers without scroll-driven
+     animations simply show the content normally (nothing is ever hidden).
+     Stagger items that enter together with style={{ '--d': '10%' }}. */
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: motion-in linear both;
+      animation-timeline: view();
+      animation-range: entry calc(0% + var(--d, 0%)) entry calc(45% + var(--d, 0%));
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Moving project cards (marquee)                                      */
+/* ------------------------------------------------------------------ */
+
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+}
+
+/* The track holds two identical sets of cards and slides one set's width to the RIGHT, then
+   restarts, so the loop never shows a gap. (Cards use margin, not gap, so both halves are
+   exactly the same width.) */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-right 60s linear infinite;
+}
+.marquee-card {
+  margin-right: 1.25rem;
+}
+
+/* Hovering or focusing any card pauses the whole strip so its text can be read */
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Reduced motion: no animation, the strip becomes a normal swipeable row */
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Drift: content slides toward the lower right as it leaves the screen */
+/* ------------------------------------------------------------------ */
+
+/* Every .drift element does the same thing at both edges of the screen:
+     - leaving at the TOP (scrolling down)   -> drifts down and to the right, fading out
+     - leaving at the BOTTOM (scrolling up)  -> drifts down and to the right, fading out
+   and the reverse when it comes back into view. Distance: set --drift-x / --drift-y on the element
+   (defaults below). */
+@keyframes drift-in {
+  from {
+    translate: var(--drift-x, 6vw) var(--drift-y, 8vh);
+    opacity: 0;
+  }
+}
+@keyframes drift-out {
+  to {
+    translate: var(--drift-x, 6vw) var(--drift-y, 8vh);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .drift {
+      /* "in" is held back before it starts, "out" is held after it ends; between them nothing applies */
+      animation: drift-in linear backwards, drift-out linear forwards;
+      animation-timeline: view(), view();
+      animation-range: entry 0% entry 70%, exit 0% exit 75%;
+    }
+  }
+}
